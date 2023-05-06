@@ -1,0 +1,63 @@
+.image-container{
+    background-image: url(../images/instafront.png) !important;
+    height: 87vh;
+    width: 65vh;
+    position: relative;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 65vh 87vh;
+}
+
+.login-form{
+    height: 87vh;
+    width: 67vh;
+}
+.insta-img{
+    color: transparent;
+    width: 55%;
+    position: absolute;
+    height: 71%;
+    right: 51px;
+    top: 83px;
+
+}
+.home-logo{
+    object-fit: contain;
+    height: 39px !important;
+}
+.ig-story{
+    height: 60px !important;
+    width: 60px !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.ig-user-profile{
+    height: 38px !important;
+    width: 38px !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.post-img-container{
+   max-height: 550px;
+   max-width: 100%;
+   background-color: black;
+}
+.post-img{
+    max-height: 550px !important;
+    width: 100% !important;
+    object-fit: contain;
+   
+}
+.main-round-profile{
+    height: 64px !important;
+    width: 64px !important;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.create-modal{
+    height: 100% !important;
+    width: 100% !important;
+    background-color: black;
+  
+    
+}
