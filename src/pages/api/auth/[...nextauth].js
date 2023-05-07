@@ -17,9 +17,14 @@ export const authOptions = {
 
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
-
+        console.log(user, "userrr");
         if (email == user.email && password == user.password) {
-          return { id: user._id, email: user.email, name: user.name };
+          console.log(email, password, user._id.toString());
+          return {
+            id: user._id.toString(),
+            email: user.email,
+            name: user.name,
+          };
         } else {
           console.log("error");
           throw new Error("error");
@@ -27,6 +32,20 @@ export const authOptions = {
       },
     }),
   ],
+
+  callbacks: {
+    async session({ session, token }) {
+      session.user = token.user;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+  },
+
   pages: {
     signIn: "/auth/signin",
   },

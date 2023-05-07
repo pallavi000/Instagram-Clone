@@ -9,8 +9,10 @@ import post1Img from "../images/post1.jpg";
 import post2Img from "../images/post2.jpg";
 import Sidebar from "@/components/Sidebar";
 import CreateModal from "@/components/CreateModal";
+import { useState } from "react";
 
 export default function Home() {
+  const [showModal, setShowModal] = useState(false);
   const images = [
     {
       name: "first",
@@ -49,7 +51,7 @@ export default function Home() {
   return (
     <div className="grid grid-cols-6 gap-4">
       <div className=" col-span-1 border-r-gray-200 border-r h-screen py-8 ">
-        <Sidebar />
+        <Sidebar setShowModal={setShowModal} />
       </div>
       <div className="col-span-3 py-8 px-2">
         <div className=" flex items-center h-fit gap-4">
@@ -91,11 +93,11 @@ export default function Home() {
 
           <div className="mt-4 post-img-container shadow-sm ">
             <Image
-              src={postImg}
+              src="/assets/images/post.jpg"
               alt="Example Image"
               layout="responsive"
-              height="100%"
-              width="100%"
+              height={100}
+              width={100}
               className="rounded-sm  post-img"
             />
           </div>
@@ -228,8 +230,7 @@ export default function Home() {
           <div className="text-md font-medium text-blue-400 ">Follow</div>
         </div>
       </div>
-
-      <CreateModal />
+      {showModal && <CreateModal setShowModal={setShowModal} />}
     </div>
   );
 }

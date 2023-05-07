@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import firstImg from "../images/first.jpg";
 import Image from "next/image";
+import axios from "axios";
+import { getSession, useSession } from "next-auth/react";
 
-function CreateModal() {
+function CreateModal({ setShowModal }) {
+  const { data: session } = useSession();
+  console.log(session);
   const [caption, setCaption] = useState("");
   const [photo, setPhoto] = useState("");
-
   useEffect(() => {
     activeInput();
   }, []);
@@ -18,16 +21,40 @@ function CreateModal() {
     });
   };
 
-  function addPost(e) {
+  async function addPost(e) {
     e.preventDefault();
-    const data = new FormData();
-    data.append("caption", caption);
-    data.append("image", photo);
+    try {
+      const data = new FormData();
+      data.append("caption", caption);
+      data.append("image", photo);
+      data.append("user_id", session?.user?.id);
+      const res = await axios.post("/api/post", data);
+      console.log(res.data);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   return (
-    <div className="fixed inset-0 bg-black   bg-opacity-30 backdrop-blur-sm flex justify-center items-center">
-      <div className="bg-white rounded-lg  font-bold w-1/3 py-4">
+    <div className="fixed inset-0 bg-black   bg-opacity-60 backdrop-blur-sm flex justify-center items-center">
+      <div
+        className="text-white font-bold absolute top-10 right-10"
+        onClick={() => setShowModal(false)}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          className="w-6 h-6 bold cursor-pointer"
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      <div className="bg-white rounded-lg  font-bold w-1/3 py-4 z-50">
         <div className="font-medium text-black text-md self-center flex justify-center pb-4 border-b border-gray-300">
           Create new post
         </div>

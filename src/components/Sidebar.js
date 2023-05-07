@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import logoImg from "../images/instagram.png";
 import Image from "next/image";
 
-function Sidebar() {
-  const [isVisible, setIsVisible] = useState(false);
+function Sidebar({ setShowModal }) {
   return (
     <div className="flex flex-col gap-8 justify-center items-start font-medium text-lx px-10 fixed ">
       <Image
