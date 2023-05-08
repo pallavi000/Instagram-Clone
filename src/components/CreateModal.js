@@ -1,25 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import firstImg from "../images/first.jpg";
 import Image from "next/image";
 import axios from "axios";
 import { getSession, useSession } from "next-auth/react";
 
-function CreateModal({ setShowModal }) {
+function CreateModal({ setShowModal, showModal }) {
+  const inputFocusRef = useRef();
   const { data: session } = useSession();
-  console.log(session);
+  console.log(session, "sessionnn");
   const [caption, setCaption] = useState("");
   const [photo, setPhoto] = useState("");
-  useEffect(() => {
-    activeInput();
-  }, []);
-  console.log(caption, photo);
-
-  const activeInput = () => {
-    document.addEventListener("DOMContentLoaded", function () {
-      var input = document.getElementById("postInput");
-      input.click();
-    });
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   async function addPost(e) {
     e.preventDefault();
@@ -29,11 +20,18 @@ function CreateModal({ setShowModal }) {
       data.append("image", photo);
       data.append("user_id", session?.user?.id);
       const res = await axios.post("/api/post", data);
-      console.log(res.data);
+
+      setShowModal(false);
     } catch (error) {
       console.log(error.message);
     }
   }
+
+  useEffect(() => {
+    if (showModal) {
+      inputFocusRef.current.focus();
+    }
+  }, [showModal]);
 
   return (
     <div className="fixed inset-0 bg-black   bg-opacity-60 backdrop-blur-sm flex justify-center items-center">
@@ -80,6 +78,7 @@ function CreateModal({ setShowModal }) {
               onChange={(e) => setCaption(e.target.value)}
               placeholder="What's on your mind ?"
               id="postInput"
+              ref={inputFocusRef}
               className="border-0 text-sm font-normal outline-none "
             />
             <div className="flex flex-col justify-center items-center py-4 ">
@@ -110,13 +109,21 @@ function CreateModal({ setShowModal }) {
                 Drag photos and videos here
               </label>
             </div>
-
-            <button
-              type="submit"
-              className="bg-blue-400 text-white font-medium w-full p-1 flex justify-center self-center rounded-md mt-4 cursor-pointer"
-            >
-              Share
-            </button>
+            {isLoading ? (
+              <button
+                type="button"
+                className="bg-blue-400 text-white font-medium w-full p-1 flex justify-center self-center rounded-md mt-4 cursor-pointer"
+              >
+                Sharing..
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="bg-blue-400 text-white font-medium w-full p-1 flex justify-center self-center rounded-md mt-4 cursor-pointer"
+              >
+                Share
+              </button>
+            )}
           </div>
         </form>
       </div>

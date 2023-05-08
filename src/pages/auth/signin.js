@@ -8,6 +8,7 @@ import firstImg from "../../images/first.jpg";
 import secondImg from "../../images/second.jpg";
 import thirdImg from "../../images/third.jpg";
 import fourthImg from "../../images/fourth.jpg";
+import Link from "next/link";
 
 function signin() {
   const [email, setEmail] = useState("");
@@ -18,7 +19,7 @@ function signin() {
   const images = [firstImg, secondImg, thirdImg, fourthImg];
 
   const changeImage = () => {
-    setTimeout(() => {
+    setInterval(() => {
       const randomIndex = Math.floor(Math.random() * images.length);
       setCurrentImg(images[randomIndex]);
     }, 1000); // Delay for 1 second
@@ -26,7 +27,7 @@ function signin() {
 
   useEffect(() => {
     changeImage();
-  }, [currentImg]);
+  }, []);
 
   const login = async (e) => {
     e.preventDefault();
@@ -113,9 +114,12 @@ function signin() {
         <div className="  px-4 py-6  border mt-8 self-center flex justify-center">
           <div className="">
             Don't have an account?{" "}
-            <span className="text-blue-400 font-medium cursor-pointer">
+            <Link
+              href={"/auth/signup"}
+              className="text-blue-400 font-medium cursor-pointer"
+            >
               Sign up
-            </span>
+            </Link>
           </div>
         </div>
       </div>

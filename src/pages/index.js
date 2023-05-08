@@ -9,10 +9,23 @@ import post1Img from "../images/post1.jpg";
 import post2Img from "../images/post2.jpg";
 import Sidebar from "@/components/Sidebar";
 import CreateModal from "@/components/CreateModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import dbConnect from "../../utils/dbConnect";
+import Post from "../../model/Post";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import signin from "./auth/signin";
+import Story from "@/components/Story";
+import PostComp from "@/components/PostComp";
 
-export default function Home() {
+export default function Home({ data }) {
+  const { data: session, status } = useSession();
+  const [authenticated, setAuthenticated] = useState(false);
+  const router = useRouter();
+
+  console.log(status, "dattttttttttttttttttttttttttttttt");
   const [showModal, setShowModal] = useState(false);
+  const posts = data;
   const images = [
     {
       name: "first",
@@ -48,116 +61,26 @@ export default function Home() {
     },
   ];
 
+  useEffect(() => {
+    if (status !== "loading" && status !== "authenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status]);
+  if (status === "loading") {
+    return null;
+  }
+
   return (
-    <div className="grid grid-cols-6 gap-4">
-      <div className=" col-span-1 border-r-gray-200 border-r h-screen py-8 ">
-        <Sidebar setShowModal={setShowModal} />
-      </div>
-      <div className="col-span-3 py-8 px-2">
+    <div className="col-span-5 grid grid-cols-5 overflow-y-auto h-screen">
+      <div className="  col-span-3 py-6 px-2">
         <div className=" flex items-center h-fit gap-4">
           {images.map((img) => {
-            return (
-              <div className="flex flex-col gap-2 items-center">
-                <div className="rounded-full relative h-16 w-16 top-0 border-blue-950 border-2 ">
-                  <Image
-                    src={img.img}
-                    alt="Example Image"
-                    layout="responsive"
-                    height={64}
-                    width={64}
-                    className="rounded-full  object-cover  ig-story"
-                  />
-                </div>
-                <div className="text-xs">{img.name}</div>
-              </div>
-            );
+            return <Story img={img} />;
           })}
         </div>
-        <div className=" px-8 mt-14">
-          <div className="flex justify-between items-center bg-white ">
-            <div className="flex justify-center items-center gap-2">
-              <div className="rounded-full relative h-10 w-10  border-blue-950 border-2 ">
-                <Image
-                  src={firstImg}
-                  alt="Example Image"
-                  layout="responsive"
-                  height={64}
-                  width={64}
-                  className="rounded-full  object-cover  ig-user-profile"
-                />
-              </div>
-              <div className="text-sm text-gray-600 font-bold">user</div>
-            </div>
-            <div className="font-bold text-gray-600 ">...</div>
-          </div>
-
-          <div className="mt-4 post-img-container shadow-sm ">
-            <Image
-              src="/assets/images/post.jpg"
-              alt="Example Image"
-              layout="responsive"
-              height={100}
-              width={100}
-              className="rounded-sm  post-img"
-            />
-          </div>
-        </div>
-        <div className=" px-8 mt-14">
-          <div className="flex justify-between items-center bg-white ">
-            <div className="flex justify-center items-center gap-2">
-              <div className="rounded-full relative h-10 w-10  border-blue-950 border-2 ">
-                <Image
-                  src={firstImg}
-                  alt="Example Image"
-                  layout="responsive"
-                  height={64}
-                  width={64}
-                  className="rounded-full  object-cover  ig-user-profile"
-                />
-              </div>
-              <div className="text-sm text-gray-600 font-bold">user</div>
-            </div>
-            <div className="font-bold text-gray-600 ">...</div>
-          </div>
-          <div className="mt-4 post-img-container shadow-sm ">
-            <Image
-              src={post1Img}
-              alt="Example Image"
-              layout="responsive"
-              height="100%"
-              width="100%"
-              className="rounded-sm  post-img"
-            />
-          </div>
-        </div>
-        <div className=" px-8 mt-14">
-          <div className="flex justify-between items-center bg-white ">
-            <div className="flex justify-center items-center gap-2">
-              <div className="rounded-full relative h-10 w-10  border-blue-950 border-2 ">
-                <Image
-                  src={firstImg}
-                  alt="Example Image"
-                  layout="responsive"
-                  height={64}
-                  width={64}
-                  className="rounded-full  object-cover  ig-user-profile"
-                />
-              </div>
-              <div className="text-sm text-gray-600 font-bold">user</div>
-            </div>
-            <div className="font-bold text-gray-600 ">...</div>
-          </div>
-          <div className="mt-4 post-img-container shadow-sm ">
-            <Image
-              src={post2Img}
-              alt="Example Image"
-              layout="responsive"
-              height="100%"
-              width="100%"
-              className="rounded-sm  post-img"
-            />
-          </div>
-        </div>
+        {posts.map((post) => {
+          return <PostComp post={post} />;
+        })}
       </div>
 
       <div className="col-span-2 mt-8 px-8">
@@ -230,7 +153,22 @@ export default function Home() {
           <div className="text-md font-medium text-blue-400 ">Follow</div>
         </div>
       </div>
-      {showModal && <CreateModal setShowModal={setShowModal} />}
+      {showModal && (
+        <CreateModal setShowModal={setShowModal} showModal={showModal} />
+      )}
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  await dbConnect();
+  const posts = await Post.find().populate("user_id").lean();
+  let serializedPosts = JSON.parse(JSON.stringify(posts));
+  console.log(serializedPosts);
+
+  return {
+    props: {
+      data: serializedPosts,
+    },
+  };
 }

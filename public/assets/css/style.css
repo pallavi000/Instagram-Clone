@@ -1,3 +1,7 @@
+body{
+    overflow: hidden !important
+}
+
 .image-container{
     background-image: url(../images/instafront.png) !important;
     height: 87vh;
@@ -53,6 +57,12 @@
     width: 64px !important;
     border-radius: 50%;
     object-fit: cover;
+}
+.main-chat-profile{
+    height: 54px !important;
+    width: 54px !important;
+    border-radius: 50%;
+    object-fit: cover  
 }
 .create-modal{
     height: 100% !important;

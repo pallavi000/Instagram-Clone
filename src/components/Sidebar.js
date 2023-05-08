@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import logoImg from "../images/instagram.png";
 import Image from "next/image";
+import { signOut } from "next-auth/react";
 
 function Sidebar({ setShowModal }) {
   return (
-    <div className="flex flex-col gap-8 justify-center items-start font-medium text-lx px-10 fixed ">
+    <div className="flex flex-col gap-8 justify-center items-start font-medium text-lx px-10 fixed border-r border-gray-200 min-h-screen">
       <Image
         src={logoImg}
         alt="Example Image"
@@ -144,7 +145,7 @@ function Sidebar({ setShowModal }) {
         <div>Create</div>
       </div>
 
-      <div>Profile</div>
+      <div onClick={() => signOut()}>Logout</div>
     </div>
   );
 }
