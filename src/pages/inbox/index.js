@@ -1,14 +1,37 @@
-import { useSession } from "next-auth/react";
-import React from "react";
+import { getSession, useSession } from "next-auth/react";
+import React, { useEffect, useState } from "react";
 import firstImg from "../../images/first.jpg";
 import Image from "next/image";
 import ChatList from "@/components/ChatList";
+import MessageList from "@/components/MessageList";
+import Chat from "../../../model/Chat";
+import axios from "axios";
 
-function index() {
+function index({ data: chats }) {
+  console.log(JSON.parse(chats), "chats");
   const { data } = useSession();
-  const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  const [chatList, setChatList] = useState(JSON.parse(chats));
+  const [isActiveChat, setIsActiveChat] = useState(null);
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    if (isActiveChat) {
+      getMessages();
+    }
+  }, [isActiveChat]);
+
+  const getMessages = async () => {
+    try {
+      const res = await axios.get("/inbox/message/" + isActiveChat._id);
+      console.log(res.data);
+      setMessages(res.data);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className="col-span-5 border border-gray-200 shadow-sm  m-8  rounded-sm grid grid-cols-5 ">
+    <div className="col-span-5 border border-gray-200 shadow-sm  m-8  rounded-sm grid grid-cols-5 relative ">
       <div className="col-span-2 border-r border-gray-200  py-4  ">
         <div className="flex items-center justify-end border-b border-gray-200 py-4 px-8">
           <div className="flex mr-24 ">
@@ -50,32 +73,64 @@ function index() {
           </div>
         </div>
         <div className="p-4 overflow-y-scroll h-[470px]">
-          {arr.map((post, index) => {
-            return <ChatList key={index} />;
+          {chatList.map((chat, index) => {
+            return (
+              <ChatList
+                key={index}
+                chat={chat}
+                isActiveChat={isActiveChat}
+                setIsActiveChat={setIsActiveChat}
+              />
+            );
           })}
         </div>
       </div>
-      <div className=" col-span-3 flex justify-center items-center  flex-col gap-4">
-        <div className="p-8 rounded-full h-24 w-24 border border-gray-200 relative">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className=" h-12 w-12 absolute"
-          >
-            <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
-          </svg>
+      {isActiveChat ? (
+        <MessageList messages={messages} chat={isActiveChat} />
+      ) : (
+        <div className=" col-span-3 flex justify-center items-center  flex-col gap-4">
+          <div className="p-8 rounded-full h-24 w-24 border border-gray-200 relative">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className=" h-12 w-12 absolute"
+            >
+              <path d="M3.105 2.289a.75.75 0 00-.826.95l1.414 4.925A1.5 1.5 0 005.135 9.25h6.115a.75.75 0 010 1.5H5.135a1.5 1.5 0 00-1.442 1.086l-1.414 4.926a.75.75 0 00.826.95 28.896 28.896 0 0015.293-7.154.75.75 0 000-1.115A28.897 28.897 0 003.105 2.289z" />
+            </svg>
+          </div>
+          <div className=" text-3xl font-medium">Your Message</div>
+          <div className="text-sm text-gray-600">
+            Send private photos and messages to a friend or group.
+          </div>
+          <button className="font-medium bg-blue-400 text-white py-2 px-3 rounded rounded-md">
+            Send Message
+          </button>
         </div>
-        <div className=" text-3xl font-medium">Your Message</div>
-        <div className="text-sm text-gray-600">
-          Send private photos and messages to a friend or group.
-        </div>
-        <button className="font-medium bg-blue-400 text-white py-2 px-3 rounded rounded-md">
-          Send Message
-        </button>
-      </div>
+      )}
     </div>
   );
 }
 
 export default index;
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  let chats = [];
+  try {
+    chats = await Chat.find({ participants: session?.user?.id })
+      .populate("participants")
+      .populate({
+        path: "participants",
+        match: { _id: { $ne: session?.user?.id } }, // Exclude the current user from the receiver list
+      })
+      .sort({ createdAt: -1 })
+      .exec();
+  } catch (error) {}
+
+  return {
+    props: {
+      data: JSON.stringify(chats),
+    },
+  };
+}

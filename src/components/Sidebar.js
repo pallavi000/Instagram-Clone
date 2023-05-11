@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import logoImg from "../images/instagram.png";
 import Image from "next/image";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 function Sidebar({ setShowModal }) {
   return (
@@ -104,7 +105,10 @@ function Sidebar({ setShowModal }) {
         <div>Notifications</div>
       </div>
 
-      <div className="flex justify-center items-center gap-4 cursor-pointer">
+      <Link
+        href={"/inbox"}
+        className="flex justify-center items-center gap-4 cursor-pointer"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -121,7 +125,7 @@ function Sidebar({ setShowModal }) {
         </svg>
 
         <div>Message</div>
-      </div>
+      </Link>
 
       <div
         className="flex justify-center items-center gap-4 cursor-pointer"

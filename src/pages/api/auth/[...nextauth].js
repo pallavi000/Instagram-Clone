@@ -26,7 +26,7 @@ export const authOptions = {
             name: user.name,
           };
         } else {
-          console.log("error");
+          console.log("error aayo");
           throw new Error("error");
         }
       },

@@ -47,7 +47,7 @@ function signin() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen col-span-6">
       <div className="image-container ">
         <div className="insta-img">
           <Image

@@ -41,7 +41,7 @@ function signup() {
       };
       console.log(data);
 
-      const res = await axios.post("/api/user/", data);
+      const res = await axios.post("/user/", data);
       router.push("/");
     } catch (error) {
       console.log(error);
@@ -49,7 +49,7 @@ function signup() {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center h-screen col-span-6">
       <div className="image-container ">
         <div className="insta-img">
           <Image

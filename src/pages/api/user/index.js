@@ -8,7 +8,7 @@ export default async function user(req, res, query) {
   const { action } = req.query;
   if (method === "GET") {
     const users = await User.find();
-    console.log(users);
+
     res.send(users);
   } else if (method === "POST") {
     if (req.body.action === "login") {

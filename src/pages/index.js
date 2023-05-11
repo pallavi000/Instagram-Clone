@@ -17,6 +17,7 @@ import { useRouter } from "next/router";
 import signin from "./auth/signin";
 import Story from "@/components/Story";
 import PostComp from "@/components/PostComp";
+import User from "../../model/User";
 
 export default function Home({ data }) {
   const { data: session, status } = useSession();
@@ -163,6 +164,7 @@ export default function Home({ data }) {
 export async function getServerSideProps() {
   await dbConnect();
   const posts = await Post.find().populate("user_id").lean();
+  const users = await User.find();
   let serializedPosts = JSON.parse(JSON.stringify(posts));
   console.log(serializedPosts);
 
