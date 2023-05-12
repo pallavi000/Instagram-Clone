@@ -3,12 +3,27 @@ import firstImg from "../images/fourth.jpg";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import axios from "axios";
+import io from "socket.io-client";
 
-function MessageList({ messages, chat }) {
+function MessageList({ setMessages, messages, chat }) {
   const { data: session } = useSession();
   const [isSubmit, setIsSubmit] = useState(false);
   const [input, setInput] = useState("");
-  const inputRef = useRef();
+  const socket = useRef();
+
+  async function connectSocket() {}
+  // socket connect
+  useEffect(() => {
+    socket.current = io("http://localhost:3000", {
+      path: "/api/socket",
+    });
+
+    if (socket.current) {
+      socket.current.on("message", (data) => {
+        console.log(data, "socket data");
+      });
+    }
+  }, [socket]);
 
   useEffect(() => {
     if (input.length > 0) {
@@ -27,7 +42,6 @@ function MessageList({ messages, chat }) {
         receiver_id: chat.participants[0]._id,
         chat_id: chat._id,
       };
-      console.log(data, "datttttttttttttttttttttttttttttttttttt");
       const res = await axios.post("/inbox/message", data);
       console.log(res);
     } catch (error) {
@@ -36,7 +50,7 @@ function MessageList({ messages, chat }) {
   };
 
   return (
-    <div className=" col-span-3 relative">
+    <div className=" col-span-3 relative ">
       <div className="flex items-center justify-between border-b border-gray-200 py-5 px-8 mb-6 relative">
         <div className="flex justify-center items-center gap-2">
           <div className="rounded-full relative h-8 w-8  border-blue-950 border-2 ">
@@ -71,7 +85,7 @@ function MessageList({ messages, chat }) {
         </div>
       </div>
 
-      <div className="message-list  justify-between px-4 ">
+      <div className="message-list  justify-between px-4 overflow-y-scroll h-[399px] ">
         {messages.map((message) => {
           return session?.user?.id !== message?.sender_id ||
             session?.user?.id !== message?.sender_id ? (
@@ -123,7 +137,6 @@ function MessageList({ messages, chat }) {
           </div>
           <input
             className="col-span-6 outline-0 border-0 text-sm text-gray-600"
-            ref={inputRef}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Message..."
           ></input>

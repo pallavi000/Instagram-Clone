@@ -8,7 +8,6 @@ import Chat from "../../../model/Chat";
 import axios from "axios";
 
 function index({ data: chats }) {
-  console.log(JSON.parse(chats), "chats");
   const { data } = useSession();
   const [chatList, setChatList] = useState(JSON.parse(chats));
   const [isActiveChat, setIsActiveChat] = useState(null);
@@ -23,7 +22,6 @@ function index({ data: chats }) {
   const getMessages = async () => {
     try {
       const res = await axios.get("/inbox/message/" + isActiveChat._id);
-      console.log(res.data);
       setMessages(res.data);
     } catch (error) {
       console.log(error.message);
@@ -86,7 +84,11 @@ function index({ data: chats }) {
         </div>
       </div>
       {isActiveChat ? (
-        <MessageList messages={messages} chat={isActiveChat} />
+        <MessageList
+          setMessages={setMessages}
+          messages={messages}
+          chat={isActiveChat}
+        />
       ) : (
         <div className=" col-span-3 flex justify-center items-center  flex-col gap-4">
           <div className="p-8 rounded-full h-24 w-24 border border-gray-200 relative">

@@ -6,6 +6,5 @@ export default async function message(req, res, query) {
   if (method === "GET") {
     const message = await Message.find({ chat_id: req.query.id });
     res.send(message);
-    console.log(message);
   }
 }
