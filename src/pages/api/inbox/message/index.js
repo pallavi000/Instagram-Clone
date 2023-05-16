@@ -1,5 +1,4 @@
 import Message from "../../../../../model/Message";
-import { getUser } from "../../../../../utils/socketUsers";
 
 export default async function message(req, res, query) {
   const { method, body } = req;
@@ -14,10 +13,6 @@ export default async function message(req, res, query) {
       message: body.message,
     });
     message = await message.save();
-    if (res?.socket?.server?.io) {
-      console.log("emit message", getUser(1));
-      res.socket.server.io.emit("message", message);
-    }
     res.send(message);
   }
 }

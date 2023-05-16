@@ -6,6 +6,7 @@ import ChatList from "@/components/ChatList";
 import MessageList from "@/components/MessageList";
 import Chat from "../../../model/Chat";
 import axios from "axios";
+import dbConnect from "../../../utils/dbConnect";
 
 function index({ data: chats }) {
   const { data } = useSession();
@@ -72,14 +73,14 @@ function index({ data: chats }) {
         </div>
         <div className="p-4 overflow-y-scroll h-[470px]">
           {chatList.map((chat, index) => {
-            return (
+            return chat.participants && chat.participants.length ? (
               <ChatList
                 key={index}
                 chat={chat}
                 isActiveChat={isActiveChat}
                 setIsActiveChat={setIsActiveChat}
               />
-            );
+            ) : null;
           })}
         </div>
       </div>
@@ -120,6 +121,7 @@ export async function getServerSideProps(context) {
   const session = await getSession(context);
   let chats = [];
   try {
+    await dbConnect();
     chats = await Chat.find({ participants: session?.user?.id })
       .populate("participants")
       .populate({

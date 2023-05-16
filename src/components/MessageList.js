@@ -12,18 +12,33 @@ function MessageList({ setMessages, messages, chat }) {
   const socket = useRef();
 
   async function connectSocket() {}
+
   // socket connect
   useEffect(() => {
-    socket.current = io("http://localhost:3000", {
-      path: "/api/socket",
-    });
-
-    if (socket.current) {
-      socket.current.on("message", (data) => {
-        console.log(data, "socket data");
+    console.log("messagelist");
+    if (!socket.current) {
+      socket.current = io("http://localhost:3000", {
+        path: "/api/socket",
       });
     }
-  }, [socket]);
+
+    if (socket.current) {
+      socket.current.on("connect", () => {
+        socket.current.emit("addUser", session.user);
+      });
+
+      socket.current.on("receiveMessage", (message) => {
+        setMessages((prev) => {
+          var find = prev.find((m) => m._id === message._id);
+          if (find) {
+            return prev;
+          } else {
+            return [...prev, message];
+          }
+        });
+      });
+    }
+  }, []);
 
   useEffect(() => {
     if (input.length > 0) {
@@ -43,7 +58,9 @@ function MessageList({ setMessages, messages, chat }) {
         chat_id: chat._id,
       };
       const res = await axios.post("/inbox/message", data);
-      console.log(res);
+      setMessages((prev) => [...prev, res.data]);
+      setInput("");
+      socket.current.emit("sendMessage", res.data);
     } catch (error) {
       console.log(error.message);
     }
@@ -139,6 +156,7 @@ function MessageList({ setMessages, messages, chat }) {
             className="col-span-6 outline-0 border-0 text-sm text-gray-600"
             onChange={(e) => setInput(e.target.value)}
             placeholder="Message..."
+            value={input}
           ></input>
           {isSubmit ? (
             <button
